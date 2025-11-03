@@ -6,6 +6,7 @@ import { HealthModule } from '@modules/health/health.module';
 import { LlmModule } from '@modules/llm/llm.module';
 import { AllExceptionsFilter } from '@common/filters/all-exceptions.filter';
 import appConfig from '@config/app.config';
+import llmConfig from '@config/llm.config';
 import type { AppConfig } from '@config/app.config';
 import pkg from '../package.json';
 
@@ -13,7 +14,7 @@ import pkg from '../package.json';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig],
+      load: [appConfig, llmConfig],
       envFilePath: [`.env.${process.env.NODE_ENV || 'development'}`, '.env'],
       cache: true,
     }),

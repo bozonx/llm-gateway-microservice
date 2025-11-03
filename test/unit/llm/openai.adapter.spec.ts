@@ -1,5 +1,6 @@
 import { OpenAiAdapter } from '@/modules/llm/providers/openai.adapter';
 import type { ChatRequestDto } from '@/modules/llm/dto/chat.dto';
+import { createMockConfigService } from '@test/helpers/mocks';
 
 describe('OpenAiAdapter', () => {
   const OLD_ENV = process.env;
@@ -7,7 +8,6 @@ describe('OpenAiAdapter', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     process.env = { ...OLD_ENV };
-    process.env.OPENAI_API_KEY = 'test-key';
     delete (global as any).fetch;
   });
 
@@ -16,7 +16,15 @@ describe('OpenAiAdapter', () => {
   });
 
   it('should call OpenAI chat completions and normalize response', async () => {
-    const adapter = new OpenAiAdapter();
+    const config = createMockConfigService({
+      'llm': {
+        requestTimeoutSec: 60,
+        defaultMaxTokens: 1024,
+        openaiApiKey: 'test-key',
+        openaiBaseUrl: 'https://api.openai.com',
+      },
+    });
+    const adapter = new OpenAiAdapter(config as any);
 
     const bodyCaptured: any[] = [];
     (global as any).fetch = jest.fn(async (url: string, init: any) => {
@@ -71,8 +79,8 @@ describe('OpenAiAdapter', () => {
   });
 
   it('should throw when OPENAI_API_KEY is missing', async () => {
-    delete process.env.OPENAI_API_KEY;
-    const adapter = new OpenAiAdapter();
+    const config = createMockConfigService({ 'llm': { requestTimeoutSec: 60, defaultMaxTokens: 1024 } });
+    const adapter = new OpenAiAdapter(config as any);
     await expect(
       adapter.chat({ provider: 'openai', model: 'x', messages: [{ role: 'user', content: 'Hi' }] } as any),
     ).rejects.toThrow(/OPENAI_API_KEY/);

@@ -1,5 +1,6 @@
 import { DeepSeekAdapter } from '@/modules/llm/providers/deepseek.adapter';
 import type { ChatRequestDto } from '@/modules/llm/dto/chat.dto';
+import { createMockConfigService } from '@test/helpers/mocks';
 
 describe('DeepSeekAdapter', () => {
   const OLD_ENV = process.env;
@@ -7,7 +8,6 @@ describe('DeepSeekAdapter', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     process.env = { ...OLD_ENV };
-    process.env.DEEPSEEK_API_KEY = 'deepseek-key';
     delete (global as any).fetch;
   });
 
@@ -16,7 +16,15 @@ describe('DeepSeekAdapter', () => {
   });
 
   it('should call DeepSeek chat completions and normalize response', async () => {
-    const adapter = new DeepSeekAdapter();
+    const config = createMockConfigService({
+      'llm': {
+        requestTimeoutSec: 60,
+        defaultMaxTokens: 1024,
+        deepseekApiKey: 'deepseek-key',
+        deepseekBaseUrl: 'https://api.deepseek.com',
+      },
+    });
+    const adapter = new DeepSeekAdapter(config as any);
 
     (global as any).fetch = jest.fn(async (url: string, init: any) => {
       expect(url).toMatch(/\/v1\/chat\/completions$/);
@@ -55,8 +63,8 @@ describe('DeepSeekAdapter', () => {
   });
 
   it('should throw when DEEPSEEK_API_KEY is missing', async () => {
-    delete process.env.DEEPSEEK_API_KEY;
-    const adapter = new DeepSeekAdapter();
+    const config = createMockConfigService({ 'llm': { requestTimeoutSec: 60, defaultMaxTokens: 1024 } });
+    const adapter = new DeepSeekAdapter(config as any);
     await expect(
       adapter.chat({ provider: 'deepseek', model: 'x', messages: [{ role: 'user', content: 'Hi' }] } as any),
     ).rejects.toThrow(/DEEPSEEK_API_KEY/);

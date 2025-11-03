@@ -1,15 +1,22 @@
 import { Injectable, HttpException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { ChatRequestDto, ChatResponseDto } from '../dto/chat.dto';
 import type { LlmProviderAdapter } from './base.adapter';
+import type { LlmConfig } from '@/config/llm.config';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout';
 
 @Injectable()
 export class DeepSeekAdapter implements LlmProviderAdapter {
+  constructor(private readonly configService: ConfigService) {}
+
   public async chat(request: ChatRequestDto): Promise<ChatResponseDto> {
-    const apiKey = process.env.DEEPSEEK_API_KEY;
+    const llm = this.configService.get<LlmConfig>('llm')!;
+    const apiKey = llm.deepseekApiKey;
     if (!apiKey) {
       throw new HttpException('DEEPSEEK_API_KEY is not configured', 500);
     }
-    const baseUrl = process.env.DEEPSEEK_BASE_URL || 'https://api.deepseek.com';
+    const baseUrl = llm.deepseekBaseUrl;
+    const timeoutMs = (llm.requestTimeoutSec ?? 60) * 1000;
 
     const body: Record<string, unknown> = {
       model: request.model,
@@ -19,19 +26,20 @@ export class DeepSeekAdapter implements LlmProviderAdapter {
     if (typeof request.temperature === 'number') body.temperature = request.temperature;
     if (typeof request.top_p === 'number') body.top_p = request.top_p;
     if (typeof request.max_tokens === 'number') body.max_tokens = request.max_tokens;
+    else body.max_tokens = llm.defaultMaxTokens;
 
     if (request.providerOptions && typeof request.providerOptions === 'object') {
       Object.assign(body, request.providerOptions);
     }
 
-    const res = await fetch(`${baseUrl}/v1/chat/completions`, {
+    const res = await fetchWithTimeout(`${baseUrl}/v1/chat/completions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
+    }, timeoutMs);
 
     const text = await res.text();
     let json: any;

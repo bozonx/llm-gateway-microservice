@@ -1,5 +1,6 @@
 import { AnthropicAdapter } from '@/modules/llm/providers/anthropic.adapter';
 import type { ChatRequestDto } from '@/modules/llm/dto/chat.dto';
+import { createMockConfigService } from '@test/helpers/mocks';
 
 describe('AnthropicAdapter', () => {
   const OLD_ENV = process.env;
@@ -7,8 +8,6 @@ describe('AnthropicAdapter', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     process.env = { ...OLD_ENV };
-    process.env.ANTHROPIC_API_KEY = 'anthropic-key';
-    process.env.ANTHROPIC_API_VERSION = '2023-06-01';
     delete (global as any).fetch;
   });
 
@@ -17,7 +16,16 @@ describe('AnthropicAdapter', () => {
   });
 
   it('should call Anthropic messages API and normalize response', async () => {
-    const adapter = new AnthropicAdapter();
+    const config = createMockConfigService({
+      'llm': {
+        requestTimeoutSec: 60,
+        defaultMaxTokens: 1024,
+        anthropicApiKey: 'anthropic-key',
+        anthropicBaseUrl: 'https://api.anthropic.com',
+        anthropicApiVersion: '2023-06-01',
+      },
+    });
+    const adapter = new AnthropicAdapter(config as any);
 
     (global as any).fetch = jest.fn(async (_url: string, init: any) => {
       const req = JSON.parse(init.body);
@@ -62,8 +70,8 @@ describe('AnthropicAdapter', () => {
   });
 
   it('should throw when ANTHROPIC_API_KEY is missing', async () => {
-    delete process.env.ANTHROPIC_API_KEY;
-    const adapter = new AnthropicAdapter();
+    const config = createMockConfigService({ 'llm': { requestTimeoutSec: 60, defaultMaxTokens: 1024, anthropicApiVersion: '2023-06-01', anthropicBaseUrl: 'https://api.anthropic.com' } });
+    const adapter = new AnthropicAdapter(config as any);
     await expect(
       adapter.chat({ provider: 'anthropic', model: 'x', messages: [{ role: 'user', content: 'Hi' }] } as any),
     ).rejects.toThrow(/ANTHROPIC_API_KEY/);

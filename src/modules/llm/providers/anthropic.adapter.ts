@@ -1,6 +1,9 @@
 import { Injectable, HttpException } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import type { ChatRequestDto, ChatResponseDto, ChatMessageDto } from '../dto/chat.dto';
 import type { LlmProviderAdapter } from './base.adapter';
+import type { LlmConfig } from '@/config/llm.config';
+import { fetchWithTimeout } from '@/utils/fetch-with-timeout';
 
 function splitSystem(messages: ChatMessageDto[]): { system?: string; rest: ChatMessageDto[] } {
   const systemParts: string[] = [];
@@ -14,13 +17,17 @@ function splitSystem(messages: ChatMessageDto[]): { system?: string; rest: ChatM
 
 @Injectable()
 export class AnthropicAdapter implements LlmProviderAdapter {
+  constructor(private readonly configService: ConfigService) {}
+
   public async chat(request: ChatRequestDto): Promise<ChatResponseDto> {
-    const apiKey = process.env.ANTHROPIC_API_KEY;
+    const llm = this.configService.get<LlmConfig>('llm')!;
+    const apiKey = llm.anthropicApiKey;
     if (!apiKey) {
       throw new HttpException('ANTHROPIC_API_KEY is not configured', 500);
     }
-    const baseUrl = process.env.ANTHROPIC_BASE_URL || 'https://api.anthropic.com';
-    const version = process.env.ANTHROPIC_API_VERSION || '2023-06-01';
+    const baseUrl = llm.anthropicBaseUrl;
+    const version = llm.anthropicApiVersion;
+    const timeoutMs = (llm.requestTimeoutSec ?? 60) * 1000;
 
     const { system, rest } = splitSystem(request.messages);
 
@@ -30,7 +37,7 @@ export class AnthropicAdapter implements LlmProviderAdapter {
         role: m.role,
         content: [{ type: 'text', text: m.content }],
       })),
-      max_tokens: typeof request.max_tokens === 'number' ? request.max_tokens : 1024,
+      max_tokens: typeof request.max_tokens === 'number' ? request.max_tokens : llm.defaultMaxTokens,
     };
     if (system) body.system = system;
     if (typeof request.temperature === 'number') body.temperature = request.temperature;
@@ -40,7 +47,7 @@ export class AnthropicAdapter implements LlmProviderAdapter {
       Object.assign(body, request.providerOptions);
     }
 
-    const res = await fetch(`${baseUrl}/v1/messages`, {
+    const res = await fetchWithTimeout(`${baseUrl}/v1/messages`, {
       method: 'POST',
       headers: {
         'x-api-key': apiKey,
@@ -48,7 +55,7 @@ export class AnthropicAdapter implements LlmProviderAdapter {
         'content-type': 'application/json',
       },
       body: JSON.stringify(body),
-    });
+    }, timeoutMs);
 
     const text = await res.text();
     let json: any;

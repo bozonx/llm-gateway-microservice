@@ -1,5 +1,6 @@
 import { OpenRouterAdapter } from '@/modules/llm/providers/openrouter.adapter';
 import type { ChatRequestDto } from '@/modules/llm/dto/chat.dto';
+import { createMockConfigService } from '@test/helpers/mocks';
 
 describe('OpenRouterAdapter', () => {
   const OLD_ENV = process.env;
@@ -7,7 +8,6 @@ describe('OpenRouterAdapter', () => {
   beforeEach(() => {
     jest.resetAllMocks();
     process.env = { ...OLD_ENV };
-    process.env.OPENROUTER_API_KEY = 'openrouter-key';
     delete (global as any).fetch;
   });
 
@@ -16,7 +16,15 @@ describe('OpenRouterAdapter', () => {
   });
 
   it('should call OpenRouter chat completions and normalize response', async () => {
-    const adapter = new OpenRouterAdapter();
+    const config = createMockConfigService({
+      'llm': {
+        requestTimeoutSec: 60,
+        defaultMaxTokens: 1024,
+        openrouterApiKey: 'openrouter-key',
+        openrouterBaseUrl: 'https://openrouter.ai/api',
+      },
+    });
+    const adapter = new OpenRouterAdapter(config as any);
 
     (global as any).fetch = jest.fn(async (url: string, init: any) => {
       expect(url).toMatch(/\/v1\/chat\/completions$/);
@@ -55,8 +63,8 @@ describe('OpenRouterAdapter', () => {
   });
 
   it('should throw when OPENROUTER_API_KEY is missing', async () => {
-    delete process.env.OPENROUTER_API_KEY;
-    const adapter = new OpenRouterAdapter();
+    const config = createMockConfigService({ 'llm': { requestTimeoutSec: 60, defaultMaxTokens: 1024 } });
+    const adapter = new OpenRouterAdapter(config as any);
     await expect(
       adapter.chat({ provider: 'openrouter', model: 'x', messages: [{ role: 'user', content: 'Hi' }] } as any),
     ).rejects.toThrow(/OPENROUTER_API_KEY/);
