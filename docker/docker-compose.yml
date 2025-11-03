@@ -1,7 +1,8 @@
 services:
-  nestjs-boilerplate:
-    image: ghcr.io/bozonx/nestjs-boilerplate:latest
-    container_name: nestjs-boilerplate
+  llm-gateway-microservice:
+    image: ghcr.io/bozonx/llm-gateway-microservice:latest
+    container_name: llm-gateway-microservice
+    hostname: llm-gateway-microservice
     ports:
       - '8080:80'
     environment:
