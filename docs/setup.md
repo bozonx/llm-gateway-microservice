@@ -13,6 +13,7 @@
 - `OPENAI_API_KEY`
 - `ANTHROPIC_API_KEY`
 - `DEEPSEEK_API_KEY`
+- `OPENROUTER_API_KEY`
 
 Опционально:
 
@@ -20,6 +21,7 @@
 - `ANTHROPIC_BASE_URL` (по умолчанию `https://api.anthropic.com`)
 - `ANTHROPIC_API_VERSION` (по умолчанию `2023-06-01`)
 - `DEEPSEEK_BASE_URL` (по умолчанию `https://api.deepseek.com`)
+- `OPENROUTER_BASE_URL` (по умолчанию `https://openrouter.ai/api`)
 
 ## Локальный запуск
 

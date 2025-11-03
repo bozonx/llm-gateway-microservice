@@ -6,8 +6,8 @@
 
 ```json
 {
-  "provider": "openai | anthropic | deepseek",
-  "model": "gpt-4o-mini | claude-3-5-sonnet-latest | deepseek-chat",
+  "provider": "openai | anthropic | deepseek | openrouter",
+  "model": "gpt-4o-mini | claude-3-5-sonnet-latest | deepseek-chat | openrouter/auto",
   "messages": [
     {"role": "system", "content": "You are ..."},
     {"role": "user", "content": "Hello"}
@@ -32,7 +32,7 @@
     {"index": 0, "message": {"role": "assistant", "content": "..."}, "finish_reason": "stop"}
   ],
   "usage": {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
-  "provider": "openai | anthropic | deepseek"
+  "provider": "openai | anthropic | deepseek | openrouter"
 }
 ```
 
@@ -41,6 +41,7 @@
 - **OpenAI**: совместим с `/v1/chat/completions`. Требуется `OPENAI_API_KEY`.
 - **DeepSeek**: OpenAI-совместимый эндпоинт `/v1/chat/completions`. Требуется `DEEPSEEK_API_KEY`.
 - **Anthropic**: эндпоинт `/v1/messages`. `system` собирается из всех сообщений роли `system` и передаётся отдельным полем. Требуется `ANTHROPIC_API_KEY`, заголовок `anthropic-version` (см. `ANTHROPIC_API_VERSION`).
+- **OpenRouter**: OpenAI-совместимый эндпоинт `/v1/chat/completions` на базе URL `https://openrouter.ai/api` (по умолчанию). Требуется `OPENROUTER_API_KEY`.
 
 ### Примеры
 
@@ -72,6 +73,17 @@ curl -s http://localhost:80/api/v1/llm/chat \
   -d '{
     "provider":"deepseek",
     "model":"deepseek-chat",
+    "messages":[{"role":"user","content":"Hello"}],
+    "max_tokens":64
+  }'
+```
+
+```bash
+curl -s http://localhost:80/api/v1/llm/chat \
+  -H 'content-type: application/json' \
+  -d '{
+    "provider":"openrouter",
+    "model":"openrouter/auto",
     "messages":[{"role":"user","content":"Hello"}],
     "max_tokens":64
   }'

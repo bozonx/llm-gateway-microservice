@@ -4,7 +4,7 @@
 
 - Транспорт: HTTP (NestJS + Fastify)
 - Точка входа: `POST /api/v1/llm/chat`
-- Поддерживаемые провайдеры v1: `openai`, `anthropic`, `deepseek`
+- Поддерживаемые провайдеры v1: `openai`, `anthropic`, `deepseek`, `openrouter`
 - Потоковые ответы (stream) в v1: отсутствуют
 - Авторизация, CORS, rate limiting: реализуются на API Gateway (не здесь)
 

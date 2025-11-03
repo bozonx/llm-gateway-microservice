@@ -1,7 +1,7 @@
 import { IsArray, IsDefined, IsIn, IsInt, IsNumber, IsObject, IsOptional, IsString, Max, Min, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-export const PROVIDERS = ['openai', 'anthropic', 'deepseek'] as const;
+export const PROVIDERS = ['openai', 'anthropic', 'deepseek', 'openrouter'] as const;
 export type Provider = (typeof PROVIDERS)[number];
 
 export interface ChatChoiceMessage {

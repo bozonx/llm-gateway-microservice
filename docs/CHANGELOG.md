@@ -10,6 +10,7 @@
 - Поддержка провайдеров: `openai`, `anthropic`, `deepseek` (без streaming)
 - Нормализация ответа к OpenAI Chat Completions (упрощённый формат)
 - Документация: `docs/overview.md`, `docs/api.md`, `docs/setup.md`
+- Добавлен провайдер `openrouter` (OpenAI-совместимый `/v1/chat/completions`), обновлены README и документация
 
 ## 0.15.0 — Boilerplate refactor
 

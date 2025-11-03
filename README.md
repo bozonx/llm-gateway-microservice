@@ -62,7 +62,7 @@ URL по умолчанию (prod): `http://localhost:80/api/v1`
 Унифицированный доступ к LLM через OpenAI-совместный контракт.
 
 - Эндпоинт: `POST /{API_BASE_PATH}/{API_VERSION}/llm/chat`
-- Провайдеры v1: `openai`, `anthropic`, `deepseek`
+- Провайдеры v1: `openai`, `anthropic`, `deepseek`, `openrouter`
 - Потоковые ответы: отсутствуют в v1
 
 Документация:

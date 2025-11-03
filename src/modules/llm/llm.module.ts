@@ -5,9 +5,17 @@ import { ProviderRegistry } from './providers/provider-registry';
 import { OpenAiAdapter } from './providers/openai.adapter';
 import { AnthropicAdapter } from './providers/anthropic.adapter';
 import { DeepSeekAdapter } from './providers/deepseek.adapter';
+import { OpenRouterAdapter } from './providers/openrouter.adapter';
 
 @Module({
   controllers: [LlmController],
-  providers: [LlmService, ProviderRegistry, OpenAiAdapter, AnthropicAdapter, DeepSeekAdapter],
+  providers: [
+    LlmService,
+    ProviderRegistry,
+    OpenAiAdapter,
+    AnthropicAdapter,
+    DeepSeekAdapter,
+    OpenRouterAdapter,
+  ],
 })
 export class LlmModule {}
