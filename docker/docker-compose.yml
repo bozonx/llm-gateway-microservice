@@ -3,6 +3,8 @@ services:
     image: ghcr.io/bozonx/llm-gateway-microservice:latest
     container_name: llm-gateway-microservice
     hostname: llm-gateway-microservice
+    restart: unless-stopped
+    user: '1000:1000'
     ports:
       - '8080:80'
     environment:
@@ -18,7 +20,6 @@ services:
 
       # Logging
       - LOG_LEVEL=warn
-    restart: unless-stopped
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:80/api/v1/health || exit 1']
       interval: 30s
