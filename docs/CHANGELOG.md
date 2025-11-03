@@ -6,6 +6,10 @@
 - Добавлен `docs/dev.md` с инструкциями по разработке и dev-режиму
 - Уточнены prod URL и Docker Compose команды в README
 - В разделе env добавлено упоминание `TZ` и что источником истины является `.env.production.example`
+- Добавлен модуль LLM Gateway (NestJS) с эндпоинтом `POST /api/v1/llm/chat`
+- Поддержка провайдеров: `openai`, `anthropic`, `deepseek` (без streaming)
+- Нормализация ответа к OpenAI Chat Completions (упрощённый формат)
+- Документация: `docs/overview.md`, `docs/api.md`, `docs/setup.md`
 
 ## 0.15.0 — Boilerplate refactor
 

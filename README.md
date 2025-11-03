@@ -56,6 +56,20 @@ URL по умолчанию (prod): `http://localhost:80/api/v1`
 
 - `GET /{API_BASE_PATH}/{API_VERSION}/health`
 
+## LLM Gateway
+
+Унифицированный доступ к LLM через OpenAI-совместный контракт.
+
+- Эндпоинт: `POST /{API_BASE_PATH}/{API_VERSION}/llm/chat`
+- Провайдеры v1: `openai`, `anthropic`, `deepseek`
+- Потоковые ответы: отсутствуют в v1
+
+Документация:
+
+- [Обзор](./docs/overview.md)
+- [API](./docs/api.md)
+- [Установка и запуск](./docs/setup.md)
+
 ## Тесты
 См. инструкции в `docs/dev.md`.
 

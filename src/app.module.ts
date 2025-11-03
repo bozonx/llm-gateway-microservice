@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { APP_FILTER } from '@nestjs/core';
 import { LoggerModule } from 'nestjs-pino';
 import { HealthModule } from '@modules/health/health.module';
+import { LlmModule } from '@modules/llm/llm.module';
 import { AllExceptionsFilter } from '@common/filters/all-exceptions.filter';
 import appConfig from '@config/app.config';
 import type { AppConfig } from '@config/app.config';
@@ -89,6 +90,7 @@ import pkg from '../package.json';
       },
     }),
     HealthModule,
+    LlmModule,
   ],
   controllers: [],
   providers: [
