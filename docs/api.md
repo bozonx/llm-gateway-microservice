@@ -14,7 +14,7 @@ Response (200 OK):
 
 ## POST `/{API_BASE_PATH}/v1/llm/chat`
 
-OpenAI-compatible chat endpoint with minor extensions.
+OpenAI-compatible chat endpoint (Chat Completions) with minor extensions. Note: OpenAI's modern Responses API is not used in v1; migration can be considered in a future version.
 
 Request body:
 
@@ -53,7 +53,7 @@ Response (201 Created):
 Notes by provider:
 
 - OpenAI: uses `/v1/chat/completions`. Requires `OPENAI_API_KEY`.
-- DeepSeek: OpenAI-compatible `/v1/chat/completions`. Requires `DEEPSEEK_API_KEY`.
+- DeepSeek: `/chat/completions` (OpenAI-compatible). Requires `DEEPSEEK_API_KEY`.
 - Anthropic: uses `/v1/messages`. All `system` messages are concatenated and sent as a separate `system` field. Requires `ANTHROPIC_API_KEY` and header `anthropic-version` (`ANTHROPIC_API_VERSION`).
 - OpenRouter: OpenAI-compatible `/v1/chat/completions` with base URL `https://openrouter.ai/api` by default. Requires `OPENROUTER_API_KEY`.
 

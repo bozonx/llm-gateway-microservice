@@ -1,5 +1,5 @@
 import { registerAs } from '@nestjs/config';
-import { IsInt, IsOptional, IsString, IsUrl, Min, Max, validateSync } from 'class-validator';
+import { IsInt, IsOptional, IsString, Min, Max, validateSync } from 'class-validator';
 import { plainToInstance } from 'class-transformer';
 
 export class LlmConfig {

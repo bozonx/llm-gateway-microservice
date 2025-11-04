@@ -69,7 +69,6 @@ Unified access to LLMs via an OpenAI-compatible contract.
 ## Documentation
 
 - [API](./docs/api.md)
-- [Development Guide](./docs/dev.md)
 
 ## Tests
 See instructions in `docs/dev.md`.

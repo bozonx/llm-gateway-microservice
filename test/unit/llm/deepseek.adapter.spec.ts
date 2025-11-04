@@ -27,7 +27,7 @@ describe('DeepSeekAdapter', () => {
     const adapter = new DeepSeekAdapter(config as any);
 
     (global as any).fetch = jest.fn(async (url: string, init: any) => {
-      expect(url).toMatch(/\/v1\/chat\/completions$/);
+      expect(url).toMatch(/\/chat\/completions$/);
       const payload = JSON.parse(init.body);
       expect(payload.model).toBe('deepseek-chat');
       expect(payload.messages[0]).toEqual({ role: 'user', content: 'Hi' });

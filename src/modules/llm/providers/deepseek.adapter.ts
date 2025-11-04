@@ -32,7 +32,7 @@ export class DeepSeekAdapter implements LlmProviderAdapter {
       Object.assign(body, request.providerOptions);
     }
 
-    const res = await fetchWithTimeout(`${baseUrl}/v1/chat/completions`, {
+    const res = await fetchWithTimeout(`${baseUrl}/chat/completions`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
