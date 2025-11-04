@@ -1,26 +1,40 @@
 # API
 
-## `POST /api/v1/llm/chat`
+Base path is configured as `/{API_BASE_PATH}/v1` (see `.env.production.example`, default base path is `api`).
 
-Тело запроса (OpenAI-совместимо, с дополнительными полями):
+## GET `/{API_BASE_PATH}/v1/health`
+
+Simple health check.
+
+Response (200 OK):
+
+```json
+{ "status": "ok" }
+```
+
+## POST `/{API_BASE_PATH}/v1/llm/chat`
+
+OpenAI-compatible chat endpoint with minor extensions.
+
+Request body:
 
 ```json
 {
   "provider": "openai | anthropic | deepseek | openrouter",
   "model": "gpt-4o-mini | claude-3-5-sonnet-latest | deepseek-chat | openrouter/auto",
   "messages": [
-    {"role": "system", "content": "You are ..."},
-    {"role": "user", "content": "Hello"}
+    { "role": "system", "content": "You are ..." },
+    { "role": "user", "content": "Hello" }
   ],
   "temperature": 0.2,
   "top_p": 1,
   "max_tokens": 1024,
-  "metadata": {"traceId": "optional"},
-  "providerOptions": {"any": "native provider params"}
+  "metadata": { "traceId": "optional" },
+  "providerOptions": { "any": "native provider params" }
 }
 ```
 
-Ответ:
+Response (201 Created):
 
 ```json
 {
@@ -29,21 +43,21 @@
   "created": 1730650000,
   "model": "...",
   "choices": [
-    {"index": 0, "message": {"role": "assistant", "content": "..."}, "finish_reason": "stop"}
+    { "index": 0, "message": { "role": "assistant", "content": "..." }, "finish_reason": "stop" }
   ],
-  "usage": {"prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30},
+  "usage": { "prompt_tokens": 10, "completion_tokens": 20, "total_tokens": 30 },
   "provider": "openai | anthropic | deepseek | openrouter"
 }
 ```
 
-### Примечания по провайдерам
+Notes by provider:
 
-- **OpenAI**: совместим с `/v1/chat/completions`. Требуется `OPENAI_API_KEY`.
-- **DeepSeek**: OpenAI-совместимый эндпоинт `/v1/chat/completions`. Требуется `DEEPSEEK_API_KEY`.
-- **Anthropic**: эндпоинт `/v1/messages`. `system` собирается из всех сообщений роли `system` и передаётся отдельным полем. Требуется `ANTHROPIC_API_KEY`, заголовок `anthropic-version` (см. `ANTHROPIC_API_VERSION`).
-- **OpenRouter**: OpenAI-совместимый эндпоинт `/v1/chat/completions` на базе URL `https://openrouter.ai/api` (по умолчанию). Требуется `OPENROUTER_API_KEY`.
+- OpenAI: uses `/v1/chat/completions`. Requires `OPENAI_API_KEY`.
+- DeepSeek: OpenAI-compatible `/v1/chat/completions`. Requires `DEEPSEEK_API_KEY`.
+- Anthropic: uses `/v1/messages`. All `system` messages are concatenated and sent as a separate `system` field. Requires `ANTHROPIC_API_KEY` and header `anthropic-version` (`ANTHROPIC_API_VERSION`).
+- OpenRouter: OpenAI-compatible `/v1/chat/completions` with base URL `https://openrouter.ai/api` by default. Requires `OPENROUTER_API_KEY`.
 
-### Примеры
+Examples:
 
 ```bash
 curl -s http://localhost:80/api/v1/llm/chat \
@@ -87,4 +101,29 @@ curl -s http://localhost:80/api/v1/llm/chat \
     "messages":[{"role":"user","content":"Hello"}],
     "max_tokens":64
   }'
+```
+
+Status codes:
+
+- 201 Created — successful chat completion (NestJS default for POST)
+- 400 Bad Request — validation errors (DTO + global ValidationPipe)
+- 401/403 — provider authentication/authorization failures (propagated from provider API)
+- 429 — rate limiting from provider (propagated)
+- 5xx — internal errors (misconfiguration like missing API keys, provider errors, or timeouts)
+
+Error response shape (global exception filter):
+
+```json
+{
+  "statusCode": 400,
+  "timestamp": "2025-01-01T00:00:00.000Z",
+  "path": "/api/v1/llm/chat",
+  "method": "POST",
+  "message": "Validation failed: ...",
+  "error": {
+    "statusCode": 400,
+    "message": ["provider must be one of the following values: openai, anthropic, deepseek, openrouter"],
+    "error": "Bad Request"
+  }
+}
 ```

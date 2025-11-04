@@ -1,81 +1,82 @@
-# LLM Gateway микросервис (NestJS + Fastify)
+# LLM Gateway Microservice (NestJS + Fastify)
 
-Микросервис для унифицированного доступа к LLM через OpenAI-совместный API. Основан на NestJS + Fastify.
+Production-ready microservice providing unified access to multiple LLM providers via an OpenAI-compatible API. Built with NestJS + Fastify.
 
-## Что включено
+## Features
 
-- 🏥 Простой health-check эндпоинт `/{API_BASE_PATH}/v1/health`
-- 📊 Логирование через Pino (JSON в prod)
-- 🛡️ Глобальный фильтр ошибок
-- ⚡ Fastify
-- 🧪 Настроенные Jest-тесты (unit и e2e)
-- 🐳 Готовность к работе в Docker
+- Health-check endpoint `/{API_BASE_PATH}/v1/health`
+- Pino logging (JSON in production)
+- Global error filter
+- Fastify HTTP server
+- Jest tests (unit and e2e)
+- Docker-ready
 
-## Быстрый старт (prod)
+## Production Quick Start
 
-Требования:
+Requirements:
 
 - Node.js 22+
 - pnpm 10+
 
 ```bash
-# 1) Установка зависимостей
+# 1) Install dependencies
 pnpm install
 
-# 2) Настройка окружения (prod)
+# 2) Prepare environment (production)
 cp env.production.example .env.production
-# Установите ключи провайдеров LLM (например, OPENAI_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY)
-# при необходимости переопределите *_BASE_URL и ANTHROPIC_API_VERSION
+# Set provider API keys (e.g., OPENAI_API_KEY / ANTHROPIC_API_KEY / DEEPSEEK_API_KEY)
+# optionally override *_BASE_URL and ANTHROPIC_API_VERSION
 
-# 3) Сборка и запуск (prod)
+# 3) Build and run (production)
 pnpm build
 pnpm start:prod
 ```
 
-URL по умолчанию (prod): `http://localhost:80/api/v1`
-Для Docker Compose: `http://localhost:8080/api/v1`
+Default URL (prod): `http://localhost:80/api/v1`
+Docker Compose: `http://localhost:8080/api/v1`
 
-## Переменные окружения
+## Environment Variables
 
-Источник истины: `.env.production.example` (скопируйте в `.env.production`).
+Source of truth: `.env.production.example` (copy to `.env.production`).
 
-- Базовые настройки сервиса
+- Service basics
   - `NODE_ENV` — `production|development|test`
-  - `LISTEN_HOST` — например, `0.0.0.0`
-  - `LISTEN_PORT` — например, `80`
-  - `API_BASE_PATH` — префикс API (по умолчанию `api`)
-  - `LOG_LEVEL` — `trace|debug|info|warn|error|fatal|silent` (в prod используется JSON-логирование)
-  - `TZ` — таймзона (по умолчанию `UTC`)
+  - `LISTEN_HOST` — e.g., `0.0.0.0`
+  - `LISTEN_PORT` — e.g., `80`
+  - `API_BASE_PATH` — API prefix (default `api`)
+  - `LOG_LEVEL` — `trace|debug|info|warn|error|fatal|silent`
+  - `TZ` — timezone (default `UTC`)
 
-- Провайдеры LLM (установите ключи для используемых провайдеров)
-  - OpenAI: `OPENAI_API_KEY`, опц. `OPENAI_BASE_URL` (по умолчанию `https://api.openai.com`)
-  - Anthropic: `ANTHROPIC_API_KEY`, опц. `ANTHROPIC_BASE_URL` (по умолчанию `https://api.anthropic.com`), `ANTHROPIC_API_VERSION` (по умолчанию `2023-06-01`)
-  - DeepSeek: `DEEPSEEK_API_KEY`, опц. `DEEPSEEK_BASE_URL` (по умолчанию `https://api.deepseek.com`)
+- LLM providers (set keys for the providers you use)
+  - OpenAI: `OPENAI_API_KEY`, optional `OPENAI_BASE_URL` (default `https://api.openai.com`)
+  - Anthropic: `ANTHROPIC_API_KEY`, optional `ANTHROPIC_BASE_URL` (default `https://api.anthropic.com`), `ANTHROPIC_API_VERSION` (default `2023-06-01`)
+  - DeepSeek: `DEEPSEEK_API_KEY`, optional `DEEPSEEK_BASE_URL` (default `https://api.deepseek.com`)
+  - OpenRouter: `OPENROUTER_API_KEY`, optional `OPENROUTER_BASE_URL` (default `https://openrouter.ai/api`)
 
-## Эндпоинты
+## Endpoints
 
 - `GET /{API_BASE_PATH}/v1/health`
+- `POST /{API_BASE_PATH}/v1/llm/chat`
 
 ## LLM Gateway
 
-Унифицированный доступ к LLM через OpenAI-совместный контракт.
+Unified access to LLMs via an OpenAI-compatible contract.
 
-- Эндпоинт: `POST /{API_BASE_PATH}/v1/llm/chat`
-- Провайдеры v1: `openai`, `anthropic`, `deepseek`, `openrouter`
-- Потоковые ответы: отсутствуют в v1
+- Endpoint: `POST /{API_BASE_PATH}/v1/llm/chat`
+- v1 Providers: `openai`, `anthropic`, `deepseek`, `openrouter`
+- Streaming responses: not available in v1
 
-Документация:
+## Documentation
 
-- [Обзор](./docs/overview.md)
 - [API](./docs/api.md)
-- [Установка и запуск](./docs/setup.md)
+- [Development Guide](./docs/dev.md)
 
-## Тесты
-См. инструкции в `docs/dev.md`.
+## Tests
+See instructions in `docs/dev.md`.
 
-## Деплой через Docker (prod)
+## Deploy with Docker (prod)
 
-Вариант 1 — локальный образ:
+Option 1 — local image:
 
 ```bash
 docker build -t llm-gateway:prod .
@@ -83,13 +84,19 @@ docker run --rm -p 8080:80 \
   -e OPENAI_API_KEY=... \
   -e ANTHROPIC_API_KEY=... \
   -e DEEPSEEK_API_KEY=... \
+  -e OPENROUTER_API_KEY=... \
   llm-gateway:prod
 ```
 
-После запуска: `http://localhost:8080/api/v1/health`
+After start: `http://localhost:8080/api/v1/health`
 
-Вариант 2 — Docker Compose (см. `docker/docker-compose.yml`).
+Option 2 — Docker Compose (see `docker/docker-compose.yml`).
 
-## Лицензия
+# Development guide
+
+Please see: `stt-gateway-microservice/docs/dev.md`.
+## License
 
 MIT
+
+Development Guide: [docs/dev.md](./docs/dev.md)

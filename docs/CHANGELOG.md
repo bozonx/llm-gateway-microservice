@@ -1,27 +1,33 @@
 # CHANGELOG
 
 ## Unreleased
+ 
+ - Docs: translated to English and restructured
+   - Consolidated `docs/overview.md` and `docs/setup.md` into `README.md`
+   - Optimized README for production usage, added links to API docs and development guide
+   - Rewrote `docs/api.md` with request/response examples and status codes
+   - Marked `docs/overview.md` and `docs/setup.md` for removal
+ 
+- Removed env var `API_VERSION`; API version is hardcoded as `v1` across the service
+- Updated README, documentation, and e2e app factory for `v1`
 
-- Удалена переменная окружения `API_VERSION`; версия API захардкожена как `v1` во всём сервисе
-- Обновлены README, документация и e2e-фабрика приложения под `v1`
-
-- README ориентирован на production-использование (убраны dev-инструкции)
-- Добавлен `docs/dev.md` с инструкциями по разработке и dev-режиму
-- Уточнены prod URL и Docker Compose команды в README
-- В разделе env добавлено упоминание `TZ` и что источником истины является `.env.production.example`
-- Добавлен модуль LLM Gateway (NestJS) с эндпоинтом `POST /api/v1/llm/chat`
-- Поддержка провайдеров: `openai`, `anthropic`, `deepseek` (без streaming)
-- Нормализация ответа к OpenAI Chat Completions (упрощённый формат)
-- Документация: `docs/overview.md`, `docs/api.md`, `docs/setup.md`
-- Добавлен провайдер `openrouter` (OpenAI-совместимый `/v1/chat/completions`), обновлены README и документация
+- README oriented for production usage (dev instructions removed)
+- Added `docs/dev.md` with development instructions
+- Clarified prod URL and Docker Compose commands in README
+- Env section: mention `TZ` and `.env.production.example` as the source of truth
+- Added LLM Gateway module (NestJS) with endpoint `POST /api/v1/llm/chat`
+- Provider support: `openai`, `anthropic`, `deepseek` (no streaming)
+- Normalized responses to OpenAI Chat Completions (simplified format)
+- Documentation: `docs/overview.md`, `docs/api.md`, `docs/setup.md`
+- Added provider `openrouter` (OpenAI-compatible `/v1/chat/completions`), updated README and docs
 
 ## 0.15.0 — Boilerplate refactor
 
-- Полностью удалены функциональности STT, GraphQL и Auth
-- Оставлен только модуль Health (простой health-check)
-- Упрощены конфиги окружения (`.env.*`)
-- Обновлён `AppModule` и логирование (service: `nestjs-boilerplate`)
-- Очищены и пересобраны тесты (unit + e2e только для health)
-- Переработан `docker-compose.yml` до минимального примера (локальная сборка)
-- Обновлён `README.md` (рус.)
-- Удалены устаревшие документы в `docs/` (STT/Auth/GraphQL)
+- Removed STT, GraphQL, and Auth features
+- Kept only the Health module (simple health-check)
+- Simplified environment configs (`.env.*`)
+- Updated `AppModule` and logging (service: `nestjs-boilerplate`)
+- Cleaned and rebuilt tests (unit + e2e only for health)
+- Reworked `docker-compose.yml` to a minimal example (local build)
+- Updated `README.md` (Russian)
+- Removed outdated documents in `docs/` (STT/Auth/GraphQL)
