@@ -1,11 +1,12 @@
 import { Test } from '@nestjs/testing';
 import { ValidationPipe } from '@nestjs/common';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from '@/app.module';
+import type { AppConfig } from '@config/app.config';
 
 export async function createTestApp(): Promise<NestFastifyApplication> {
   // Ensure defaults the same as in main.ts
-  process.env.API_BASE_PATH = process.env.API_BASE_PATH ?? 'api';
 
   const moduleRef = await Test.createTestingModule({
     imports: [AppModule],
@@ -21,7 +22,9 @@ export async function createTestApp(): Promise<NestFastifyApplication> {
     new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true, transform: true }),
   );
 
-  const apiBasePath = (process.env.API_BASE_PATH || 'api').replace(/^\/+|\/+$/g, '');
+  const configService = app.get(ConfigService);
+  const appConfig = configService.get<AppConfig>('app')!;
+  const apiBasePath = appConfig.apiBasePath;
   app.setGlobalPrefix(`${apiBasePath}/v1`);
 
   await app.init();
