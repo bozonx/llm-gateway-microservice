@@ -16,6 +16,8 @@ Response (200 OK):
 
 OpenAI-compatible chat endpoint (Chat Completions) with minor extensions. Note: OpenAI's modern Responses API is not used in v1; migration can be considered in a future version.
 
+The `created` field reflects the provider's timestamp when available; otherwise, the current server time is used.
+
 Request body:
 
 ```json
@@ -107,9 +109,11 @@ Status codes:
 
 - 201 Created — successful chat completion (NestJS default for POST)
 - 400 Bad Request — validation errors (DTO + global ValidationPipe)
-- 401/403 — provider authentication/authorization failures (propagated from provider API)
+- 401/403 — provider authentication/authorization failures (propagated)
 - 429 — rate limiting from provider (propagated)
-- 5xx — internal errors (misconfiguration like missing API keys, provider errors, or timeouts)
+- 502 Bad Gateway — upstream provider error
+- 504 Gateway Timeout — request to provider timed out
+- 5xx — other internal errors (e.g., misconfiguration like missing API keys)
 
 Error response shape (global exception filter):
 

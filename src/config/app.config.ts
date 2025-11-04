@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { IsInt, IsString, IsIn, Min, Max, validateSync } from 'class-validator';
-import { plainToClass } from 'class-transformer';
+import { plainToInstance } from 'class-transformer';
 
 export class AppConfig {
   @IsInt()
@@ -23,7 +23,7 @@ export class AppConfig {
 }
 
 export default registerAs('app', (): AppConfig => {
-  const config = plainToClass(AppConfig, {
+  const config = plainToInstance(AppConfig, {
     port: parseInt(process.env.LISTEN_PORT ?? '80', 10),
     host: process.env.LISTEN_HOST ?? '0.0.0.0',
     apiBasePath: (process.env.API_BASE_PATH ?? 'api').replace(/^\/+|\/+$/g, ''),

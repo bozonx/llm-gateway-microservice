@@ -32,14 +32,20 @@ export class OpenAiAdapter implements LlmProviderAdapter {
       Object.assign(body, request.providerOptions);
     }
 
-    const res = await fetchWithTimeout(`${baseUrl}/v1/chat/completions`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-    }, timeoutMs);
+    let res: any;
+    try {
+      res = await fetchWithTimeout(`${baseUrl}/v1/chat/completions`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      }, timeoutMs);
+    } catch (e: any) {
+      const isAbort = e?.name === 'AbortError' || /aborted|timed out/i.test(String(e?.message ?? ''));
+      throw new HttpException(isAbort ? 'OpenAI request timed out' : 'OpenAI request failed', isAbort ? 504 : 502);
+    }
 
     const text = await res.text();
     let json: any;
@@ -47,7 +53,9 @@ export class OpenAiAdapter implements LlmProviderAdapter {
 
     if (!res.ok) {
       const message = json?.error?.message || text || 'OpenAI API error';
-      throw new HttpException(message, res.status);
+      const status = res.status;
+      const mapped = status >= 500 ? 502 : (status === 408 ? 504 : (status === 429 ? 429 : (status === 401 || status === 403 ? status : status)));
+      throw new HttpException(message, mapped);
     }
 
     const usage = json?.usage ?? {};
@@ -57,7 +65,7 @@ export class OpenAiAdapter implements LlmProviderAdapter {
     const response: ChatResponseDto = {
       id: json?.id ?? '',
       object: 'chat.completion',
-      created: Math.floor(Date.now() / 1000),
+      created: typeof json?.created === 'number' ? json.created : Math.floor(Date.now() / 1000),
       model: json?.model ?? request.model,
       choices: [
         {

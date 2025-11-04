@@ -71,7 +71,11 @@ Unified access to LLMs via an OpenAI-compatible contract.
 - [API](./docs/api.md)
 
 ## Tests
-See instructions in `docs/dev.md`.
+Run unit and e2e tests:
+```bash
+pnpm test:unit
+pnpm test:e2e
+```
 
 ## Deploy with Docker (prod)
 
@@ -93,9 +97,11 @@ Option 2 — Docker Compose (see `docker/docker-compose.yml`).
 
 # Development guide
 
-Please see: `stt-gateway-microservice/docs/dev.md`.
+See repository docs and code comments. All documentation is in English as per project guidelines.
+
+## Environment variable notes
+- `HTTP_REQUEST_BODY_LIMIT_MB` — max HTTP request body size in megabytes for Fastify body parser. Default: `10` (MB).
+
 ## License
 
 MIT
-
-Development Guide: [docs/dev.md](./docs/dev.md)

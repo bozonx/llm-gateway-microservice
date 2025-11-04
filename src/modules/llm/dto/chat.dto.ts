@@ -48,18 +48,21 @@ export class ChatRequestDto {
   public messages!: ChatMessageDto[];
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   @Max(2)
   public temperature?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsNumber()
   @Min(0)
   @Max(1)
   public top_p?: number;
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
   @Min(1)
   public max_tokens?: number;
